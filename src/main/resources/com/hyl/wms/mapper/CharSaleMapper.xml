@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hyl.wms.mapper.ChartSaleMapper">
+
+    <select id="query" resultType="map">
+        SELECT
+            ${groupByType} AS groupByType,
+            SUM(sa.number) AS totalNumber,
+            SUM(sa.sale_price) AS totalAmount,
+            SUM(sa.sale_amount - sa.cost_amount) AS grossProfit
+        FROM saleaccount sa
+            JOIN client c ON sa.client_id = c.id
+            JOIN employee e ON sa.saleman_id = e.id
+            JOIN product p ON p.id = sa.product_id
+            JOIN brand b ON p.brand_id = b.id
+            <include refid="where_sql"/>
+        GROUP BY groupByType
+    </select>
+
+    <sql id="where_sql">
+        <where>
+            <if test="beginDate != null">
+                AND sa.vdate &gt;= #{beginDate}
+            </if>
+            <if test="endDate != null">
+                AND sa.vdate &lt;= #{endDate}
+            </if>
+            <if test="clientId > -1">
+                AND sa.clientId = #{clientId}
+            </if>
+            <if test="brandId > -1">
+                AND p.brand_id = #{brandId}
+            </if>
+        </where>
+    </sql>
+
+
+</mapper>

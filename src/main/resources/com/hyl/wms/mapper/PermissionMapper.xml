@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hyl.wms.mapper.PermissionMapper" >
+  <resultMap id="BaseResultMap" type="com.hyl.wms.domain.Permission" >
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="expression" property="expression" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from `permission`
+    where id = #{id}
+  </delete>
+  <insert id="insert" parameterType="com.hyl.wms.domain.Permission" useGeneratedKeys="true" keyProperty="id" >
+    insert into `permission` (name, expression)
+    values (#{name}, #{expression})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hyl.wms.domain.Permission" >
+    update `permission`
+    set name = #{name},
+      expression = #{expression}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select id, name, expression
+    from `permission`
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, name, expression
+    from `permission`
+  </select>
+
+  <select id="queryForCount" resultType="int">
+  SELECT COUNT(id) FROM permission
+  
+  </select>
+  
+  <select id="queryForList" resultMap="BaseResultMap">
+  SELECT id,name,expression FROM permission
+  LIMIT #{startIndex},#{pageSize}
+  </select>
+
+  <select id="queryByRoleId" resultType="com.hyl.wms.domain.Permission">
+    SELECT id,name,expression FROM permission
+    WHERE id in(
+      SELECT permission_id FROM  role_permission WHERE role_id = #{id}
+    )
+  </select>
+  <select id="queryPermissionByEmployeeId" resultType="string">
+    SELECT expression FROM permission
+    WHERE id in(
+      SELECT permission_id FROM role_permission
+      WHERE role_id in(
+        SELECT role_id FROM employee_role
+        WHERE employee_id = #{id}
+      )
+    )
+  </select>
+
+
+</mapper>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hyl.wms.mapper.SaleAccountMapper" >
+  <resultMap id="BaseResultMap" type="com.hyl.wms.domain.SaleAccount" >
+    <id column="id" property="id" />
+    <result column="vdate" property="vdate" />
+    <result column="number" property="number" />
+    <result column="cost_price" property="costPrice" />
+    <result column="cost_amount" property="costAmount" />
+    <result column="sale_price" property="salePrice" />
+    <result column="sale_amount" property="saleAmount" />
+    <result column="product_id" property="productId" />
+    <result column="saleman_id" property="salemanId" />
+    <result column="client_id" property="clientId" />
+  </resultMap>
+
+  <insert id="insert" parameterType="com.hyl.wms.domain.SaleAccount" useGeneratedKeys="true" keyProperty="id" >
+    insert into `saleaccount` (vdate, number, cost_price, cost_amount, sale_price, sale_amount, 
+      product_id, saleman_id, client_id)
+    values (#{vdate}, #{number}, #{costPrice}, #{costAmount}, #{salePrice}, #{saleAmount}, 
+      #{productId}, #{salemanId}, #{clientId})
+  </insert>
+
+</mapper>

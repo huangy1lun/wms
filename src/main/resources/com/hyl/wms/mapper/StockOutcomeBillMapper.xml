@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hyl.wms.mapper.StockOutcomeBillMapper">
+    <resultMap id="BaseResultMap" type="com.hyl.wms.domain.StockOutcomeBill">
+        <id column="id" property="id"/>
+        <result column="sn" property="sn"/>
+        <result column="vdate" property="vdate"/>
+        <result column="status" property="status"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="total_number" property="totalNumber"/>
+        <result column="audit_time" property="auditTime"/>
+        <association property="depot" javaType="com.hyl.wms.domain.Depot" columnPrefix="d_">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+            <result column="location" property="location"/>
+        </association>
+        <association property="client" javaType="com.hyl.wms.domain.Client" columnPrefix="c_">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+        <association property="inputUser" javaType="com.hyl.wms.domain.Employee" columnPrefix="ie_">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+        <association property="auditor" javaType="com.hyl.wms.domain.Employee" columnPrefix="ae_">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+        <collection property="items" ofType="com.hyl.wms.domain.OrderBillItem" column="id"
+                    select="com.hyl.wms.mapper.StockOutcomeBillItemMapper.queryByOrderId"/>
+    </resultMap>
+
+    <sql id="select-sql">
+        ob.id, ob.sn, ob.vdate, ob.status, ob.total_amount, ob.total_number, ob.audit_time, ob.input_time,
+        ie.id AS ie_id, ie.name AS ie_name,
+        ae.id AS ae_id, ae.name AS ae_name,
+        c.id AS c_id, c.name AS c_name,
+        d.id AS d_id, d.name AS d_name, d.location AS d_location
+    </sql>
+    <sql id="from_sql">
+        FROM stockoutcomebill ob JOIN depot d ON ob.depot_id = d.id
+        JOIN employee ie ON ie.id = ob.input_user_id
+        JOIN client c ON c.id = ob.client_id
+        LEFT JOIN employee ae ON ae.id = ob.auditor_id
+    </sql>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM `stockoutcomebill`
+        WHERE id = #{id}
+    </delete>
+
+    <insert id="insert" parameterType="com.hyl.wms.domain.OrderBill" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `stockoutcomebill` (sn, vdate, status, total_amount, total_number, audit_time,
+                                        input_time, input_user_id, auditor_id, depot_id, client_id)
+        VALUES (#{sn}, #{vdate}, #{status}, #{totalAmount}, #{totalNumber}, #{auditTime},
+                       #{inputTime}, #{inputUser.id}, #{auditor.id}, #{depot.id}, #{client.id})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.hyl.wms.domain.OrderBill">
+        UPDATE `stockoutcomebill`
+        SET sn           = #{sn},
+            vdate        = #{vdate},
+            total_amount = #{totalAmount},
+            total_number = #{totalNumber},
+            depot_id     = #{depot.id}
+        WHERE id = #{id}
+    </update>
+    <update id="audit">
+        UPDATE `stockoutcomebill`
+        SET
+            auditor_id = #{auditor.id},
+            audit_time = #{auditTime},
+            status     = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+            ob.id,
+            ob.sn,
+            ob.vdate,
+            ob.status,
+            ob.total_amount,
+            ob.total_number,
+            ob.audit_time,
+            ob.input_time,
+            d.id       AS d_id,
+            d.name     AS d_name,
+            d.location AS d_location,
+            ie.id      AS ie_id,
+            ie.name    AS ie_name,
+            c.id       AS c_id,
+            c.name     AS c_name
+        FROM stockoutcomebill ob
+            JOIN depot d ON ob.depot_id = d.id
+            JOIN employee ie ON ie.id = ob.input_user_id
+            JOIN client c ON c.id = ob.client_id
+        WHERE ob.id = #{id}
+        ORDER BY ob.id
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+            id,
+            sn,
+            vdate,
+            status,
+            total_amount,
+            total_number,
+            audit_time,
+            input_time,
+            input_user_id,
+            auditor_id,
+            depot_id,
+            client_id
+        FROM `stockoutcomebill`
+    </select>
+
+    <sql id="where_sql">
+        <where>
+            <if test="beginDate != null">
+                AND ob.vdate &gt;= #{beginDate}
+            </if>
+            <if test="endDate != null">
+                AND ob.vdate &lt;= #{endDate}
+            </if>
+            <if test="depotId > -1">
+                AND ob.depot_id = #{depotId}
+            </if>
+            <if test="status > -1">
+                AND ob.status = #{status}
+            </if>
+        </where>
+    </sql>
+
+    <select id="queryForCount" resultType="int">
+        SELECT COUNT(ob.id)
+        <include refid="from_sql"/>
+        <include refid="where_sql"/>
+    </select>
+
+    <select id="queryForList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="select-sql"/>
+        <include refid="from_sql"/>
+        <include refid="where_sql"/>
+        ORDER BY ob.id
+        LIMIT #{startIndex},#{pageSize}
+    </select>
+
+</mapper>

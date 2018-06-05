@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyl.wms.mapper.ProductStockMapper">
+    <resultMap id="BaseResultMap" type="com.hyl.wms.domain.ProductStock">
+        <id column="id" property="id"/>
+        <result column="price" property="price"/>
+        <result column="store_number" property="storeNumber"/>
+        <result column="amount" property="amount"/>
+        <association property="product" javaType="com.hyl.wms.domain.Product" columnPrefix="p_">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+            <result column="brandName" property="brandName"/>
+            <result column="sn" property="sn"/>
+        </association>
+        <association property="depot" javaType="com.hyl.wms.domain.Depot" columnPrefix="d_">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+    </resultMap>
+
+    <insert id="insert" keyProperty="id" parameterType="com.hyl.wms.domain.ProductStock" useGeneratedKeys="true">
+        INSERT INTO `productstock` (price, store_number, amount, product_id, depot_id)
+        VALUES (#{price}, #{storeNumber}, #{amount}, #{product.id}, #{depot.id})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.hyl.wms.domain.ProductStock">
+        UPDATE `productstock`
+        SET price        = #{price},
+            store_number = #{storeNumber},
+            amount       = #{amount}
+        WHERE id = #{id}
+    </update>
+
+    <select id="queryForCount" resultType="int">
+        SELECT COUNT(ps.id)
+        <include refid="from_sql"/>
+        <include refid="where_sql"/>
+    </select>
+
+    <select id="queryForList" resultMap="BaseResultMap">
+        <include refid="select_sql"/>
+        <include refid="from_sql"/>
+        <include refid="where_sql"/>
+        LIMIT #{startIndex}, #{pageSize}
+    </select>
+
+
+    <select id="queryByProductIdAndDepotId" resultMap="BaseResultMap">
+        <include refid="select_sql"/>
+        <include refid="from_sql"/>
+        WHERE ps.product_id = #{productId} AND ps.depot_id = #{depotId}
+    </select>
+
+    <sql id="select_sql">
+        SELECT
+            ps.id,
+            ps.price,
+            ps.store_number,
+            ps.amount,
+            ps.product_id,
+            ps.depot_id,
+            p.id   AS p_id,
+            p.name AS p_name,
+            p.sn AS p_sn,
+            p.brand_name AS p_brandName,
+            d.id   AS d_id,
+            d.name AS d_name
+    </sql>
+
+    <sql id="from_sql">
+        FROM `productstock` ps
+        JOIN product p ON p.id = ps.product_id
+        JOIN depot d ON d.id = ps.depot_id
+    </sql>
+
+    <sql id="where_sql">
+        <where>
+            <if test="keyword != null">
+                AND (p.name like CONCAT('%',#{keyword},'%')  OR p.sn like CONCAT('%',#{keyword},'%'))
+            </if>
+            <if test="depotId > -1">
+                AND ps.depot_id = #{depotId}
+            </if>
+            <if test="brandId > -1">
+                AND p.brand_id = #{brandId}
+            </if>
+            <if test="limitNumber != null">
+                AND ps.store_number &lt;= #{limitNumber}
+            </if>
+        </where>
+    </sql>
+
+
+</mapper>
