@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hyl.wms.mapper.ProductMapper" >
+  <resultMap id="BaseResultMap" type="com.hyl.wms.domain.Product" >
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="sn" property="sn" />
+    <result column="cost_price" property="costPrice" />
+    <result column="sale_price" property="salePrice" />
+    <result column="image_path" property="imagePath" />
+    <result column="intro" property="intro" />
+    <result column="brand_id" property="brandId" />
+    <result column="brand_name" property="brandName" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from `product`
+    where id = #{id}
+  </delete>
+
+    <insert id="insert" parameterType="com.hyl.wms.domain.Product" useGeneratedKeys="true" keyProperty="id" >
+    insert into `product` (name, sn, cost_price, sale_price, image_path, intro, brand_id, 
+      brand_name)
+    values (#{name}, #{sn}, #{costPrice}, #{salePrice}, #{imagePath}, #{intro}, #{brandId}, 
+      #{brandName})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hyl.wms.domain.Product" >
+    update `product`
+    set name = #{name},
+      sn = #{sn},
+      cost_price = #{costPrice},
+      sale_price = #{salePrice},
+      image_path = #{imagePath},
+      intro = #{intro},
+      brand_id = #{brandId},
+      brand_name = #{brandName}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select id, name, sn, cost_price, sale_price, image_path, intro, brand_id, brand_name
+    from `product`
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, name, sn, cost_price, sale_price, image_path, intro, brand_id, brand_name
+    from `product`
+  </select>
+
+  <sql id="where_sql">
+    <where>
+      <if test="keyword != ''">
+        and (name like concat('%',#{keyword},'%') or brand_name like concat('%',#{keyword},'%'))
+      </if>
+      <if test="brandId > 0">
+        and brand_id = #{brandId}
+      </if>
+    </where>
+  </sql>
+
+
+  <select id="queryForCount" resultType="int">
+    SELECT COUNT(id) FROM product
+    <include refid="where_sql"/>
+  </select>
+
+  <select id="queryForList" resultMap="BaseResultMap">
+    SELECT id, name, sn, cost_price, sale_price, image_path, intro, brand_id, brand_name
+    FROM product
+    <include refid="where_sql"/>
+    LIMIT #{startIndex},#{pageSize}
+  </select>
+
+  <delete id="batchDelete">
+    DELETE FROM product
+    WHERE id IN
+    <foreach collection="ids" item="id" separator="," open="(" close=")">
+      ${id}
+    </foreach>
+  </delete>
+</mapper>

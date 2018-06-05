@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hyl.wms.mapper.SystemMenuMapper" >
+  <resultMap id="BaseResultMap" type="com.hyl.wms.domain.SystemMenu" >
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="url" property="url" />
+    <result column="sn" property="sn" />
+    <association property="parent" javaType="com.hyl.wms.domain.SystemMenu" columnPrefix="parent_">
+      <id column="id" property="id"/>
+      <result column="name" property="name"/>
+    </association>
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from `systemmenu`
+    where id = #{id}
+  </delete>
+
+  <delete id="deleteByParentId">
+    delete from systemmenu where parent_id = #{id}
+  </delete>
+  <insert id="insert" parameterType="com.hyl.wms.domain.SystemMenu" useGeneratedKeys="true" keyProperty="id" >
+    insert into `systemmenu` (name, url, sn, parent_id)
+    values (#{name}, #{url}, #{sn}, #{parent.id})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.hyl.wms.domain.SystemMenu" >
+    update `systemmenu`
+    set name = #{name},
+      url = #{url},
+      sn = #{sn},
+      parent_id = #{parent.id}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select id, name, url, sn, parent_id
+    from `systemmenu`
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, name, url, sn, parent_id
+    from `systemmenu`
+  </select>
+
+  <sql id="where_sql">
+    <where>
+      <choose>
+        <when test="parentId == null">
+          AND parent.id is null
+        </when>
+        <otherwise>
+          AND parent.id = #{parentId}
+        </otherwise>
+      </choose>
+    </where>
+  </sql>
+
+  <select id="queryForCount" resultType="int">
+    SELECT COUNT(1)
+    FROM systemmenu child LEFT JOIN  systemmenu parent ON child.parent_id = parent.id
+    <include refid="where_sql"/>
+  </select>
+
+  <select id="queryForList" resultMap="BaseResultMap">
+    SELECT child.id, child.name, child.url, child.sn,parent.id AS parent_id ,parent.name AS parent_name
+    FROM systemmenu child LEFT JOIN  systemmenu parent ON child.parent_id = parent.id
+    <include refid="where_sql"/>
+    LIMIT #{startIndex},#{pageSize}
+  </select>
+
+  <select id="loadMenus" resultType="com.hyl.wms.vo.SystemMenuVO">
+    SELECT child.id, parent.id as pId, child.url as action, child.name
+    FROM systemmenu child LEFT JOIN  systemmenu parent ON child.parent_id = parent.id
+    WHERE parent.sn = #{parentSn}
+  </select>
+  <select id="getAllModule" resultType="com.hyl.wms.domain.SystemMenu">
+    SELECT id,name FROM systemmenu WHERE parent_id IS NOT NULL ;
+  </select>
+
+  <select id="queryMenusByEmployeeId" resultType="com.hyl.wms.vo.SystemMenuVO">
+    SELECT child.id, parent.id as pId, child.url as action, child.name
+    FROM systemmenu child LEFT JOIN  systemmenu parent ON child.parent_id = parent.id
+    JOIN role_menu rm ON child.id = rm.menu_id
+    JOIN employee_role er ON er.role_id = rm.role_id
+    WHERE parent.sn = #{parentSn} AND er.employee_id = #{id}
+  </select>
+
+  <select id="queryByRoleId" resultMap="BaseResultMap">
+    select id, name, url, sn, parent_id
+    from `systemmenu`
+    WHERE id IN(
+      SELECT menu_id FROM role_menu
+      WHERE role_id = #{id}
+    )
+  </select>
+</mapper>

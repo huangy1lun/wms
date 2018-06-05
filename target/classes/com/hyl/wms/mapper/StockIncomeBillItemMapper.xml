@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hyl.wms.mapper.StockIncomeBillItemMapper">
+    <resultMap id="BaseResultMap" type="com.hyl.wms.domain.StockIncomeBillItem">
+        <id column="id" property="id"/>
+        <result column="cost_price" property="costPrice"/>
+        <result column="number" property="number"/>
+        <result column="amount" property="amount"/>
+        <result column="remark" property="remark"/>
+        <result column="bill_id" property="billId"/>
+        <association property="product" javaType="com.hyl.wms.domain.Product" columnPrefix="p_">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+    </resultMap>
+
+    <delete id="deleteByBillId">
+        DELETE FROM stockincomebillitem
+        WHERE bill_id = #{id}
+    </delete>
+    <delete id="deleteByOrderId">
+        DELETE FROM stockincomebillitem
+        WHERE bill_id = #{id}
+    </delete>
+    <insert id="insert" parameterType="com.hyl.wms.domain.StockIncomeBillItem" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `stockincomebillitem` (cost_price, number, amount, remark, product_id, bill_id)
+        VALUES (#{costPrice}, #{number}, #{amount}, #{remark}, #{product.id}, #{billId})
+    </insert>
+
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+            sb.id,
+            sb.cost_price,
+            sb.number,
+            sb.amount,
+            sb.remark,
+            sb.bill_id,
+            p.id   AS p_id,
+            p.name AS p_name
+        FROM `stockincomebillitem` sb
+            JOIN product p ON sb.product_id = p.id
+    </select>
+
+    <select id="queryByBillId" resultMap="BaseResultMap">
+        SELECT
+            sb.id,
+            sb.cost_price,
+            sb.number,
+            sb.amount,
+            sb.remark,
+            sb.bill_id,
+            p.id   AS p_id,
+            p.name AS p_name
+        FROM `stockincomebillitem` sb
+            JOIN product p ON sb.product_id = p.id
+        WHERE sb.bill_id = #{id}
+    </select>
+</mapper>

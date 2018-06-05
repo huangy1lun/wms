@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hyl.wms.mapper.ProductStockMapper">
+    <resultMap id="BaseResultMap" type="com.hyl.wms.domain.ProductStock">
+        <id column="id" property="id"/>
+        <result column="price" property="price"/>
+        <result column="store_number" property="storeNumber"/>
+        <result column="amount" property="amount"/>
+        <association property="product" javaType="com.hyl.wms.domain.Product" columnPrefix="p_">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+        <association property="depot" javaType="com.hyl.wms.domain.Depot" columnPrefix="d_">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        DELETE FROM `productstock`
+        WHERE id = #{id}
+    </delete>
+    <insert id="insert" parameterType="com.hyl.wms.domain.ProductStock" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `productstock` (price, store_number, amount, product_id, depot_id)
+        VALUES (#{price}, #{storeNumber}, #{amount}, #{product.id}, #{depot.id})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.hyl.wms.domain.ProductStock">
+        UPDATE `productstock`
+        SET price        = #{price},
+            store_number = #{storeNumber},
+            amount       = #{amount},
+            product_id   = #{product.id},
+            depot_id     = #{depot.id}
+        WHERE id = #{id}
+    </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT
+            id,
+            price,
+            store_number,
+            amount,
+            product_id,
+            depot_id
+        FROM `productstock`
+        WHERE id = #{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+            id,
+            price,
+            store_number,
+            amount,
+            product_id,
+            depot_id
+        FROM `productstock`
+    </select>
+
+    <select id="queryByProductIdAndBillId" resultMap="BaseResultMap">
+        SELECT
+            ps.id,
+            ps.price,
+            ps.store_number,
+            ps.amount,
+            p.id AS p_id,
+            p.name AS p_name,
+            d.id AS d_id,
+            d.name AS d_name
+        FROM productstock ps
+            JOIN product p ON ps.product_id = p.id
+            JOIN depot d ON ps.depot_id = d.id
+        WHERE ps.product_id = #{productId} AND ps.depot_id = #{depotId}
+    </select>
+
+
+</mapper>
