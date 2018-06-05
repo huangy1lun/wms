@@ -13,6 +13,7 @@ public class passwordTest {
 
     @Test
     public void testConfigTools() throws Exception {
+        System.out.println(111);
         String pwd = ConfigTools.encrypt("admin");
         System.out.println(pwd);
     }
