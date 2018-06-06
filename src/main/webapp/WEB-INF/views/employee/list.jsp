@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html>
@@ -68,8 +69,10 @@
                             <td>${item.dept.name}</td>
                             <td>${item.roleNames}</td>
                             <td>
+                                <shiro:hasPermission name="cn.wolfcode.wms.web.controller.EmployeeController:delete">
                                 <a href="/employee/input.do?id=${item.id}">编辑</a>
                                 <a href="javascript:;" class="delete_a" data-url="/employee/delete.do?id=${item.id}">删除</a>
+                                </shiro:hasPermission>
                             </td>
                         </tr>
                     </c:forEach>

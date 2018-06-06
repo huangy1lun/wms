@@ -7,6 +7,7 @@
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
     <!--<mvc:default-servlet-handler />-->
     <import resource="applicationContext.xml"/>
+    <import resource="shiro.xml"/>
     <!--DI 注解解析器-->
     <context:annotation-config />
     <!--IOC 注解解析器-->
@@ -47,25 +48,25 @@
     </bean>
 
     <!--配置拦截器-->
-    <mvc:interceptors>
-        <!-- 配置拦截器 -->
-        <mvc:interceptor>
-            <!-- 拦截的路径 -->
-            <mvc:mapping path="/**"/>
-            <!-- 被排除的路径 -->
-            <mvc:exclude-mapping path="/login.do" />
-            <!-- 拦截处理器类 -->
-            <bean class="com.hyl.wms.web.interceptor.checkLoginInterceptor"/>
-        </mvc:interceptor>
-        <mvc:interceptor>
-            <!-- 拦截的路径 -->
-            <mvc:mapping path="/**"/>
-            <!-- 被排除的路径 -->
-            <mvc:exclude-mapping path="/login.do" />
-            <!-- 拦截处理器类 -->
-            <bean class="com.hyl.wms.web.interceptor.SecurityInterceptor"/>
-        </mvc:interceptor>
-    </mvc:interceptors>
+    <!--<mvc:interceptors>-->
+        <!--&lt;!&ndash; 配置拦截器 &ndash;&gt;-->
+        <!--<mvc:interceptor>-->
+            <!--&lt;!&ndash; 拦截的路径 &ndash;&gt;-->
+            <!--<mvc:mapping path="/**"/>-->
+            <!--&lt;!&ndash; 被排除的路径 &ndash;&gt;-->
+            <!--<mvc:exclude-mapping path="/login.do" />-->
+            <!--&lt;!&ndash; 拦截处理器类 &ndash;&gt;-->
+            <!--<bean class="com.hyl.wms.web.interceptor.checkLoginInterceptor"/>-->
+        <!--</mvc:interceptor>-->
+        <!--<mvc:interceptor>-->
+            <!--&lt;!&ndash; 拦截的路径 &ndash;&gt;-->
+            <!--<mvc:mapping path="/**"/>-->
+            <!--&lt;!&ndash; 被排除的路径 &ndash;&gt;-->
+            <!--<mvc:exclude-mapping path="/login.do" />-->
+            <!--&lt;!&ndash; 拦截处理器类 &ndash;&gt;-->
+            <!--<bean class="com.hyl.wms.web.interceptor.SecurityInterceptor"/>-->
+        <!--</mvc:interceptor>-->
+    <!--</mvc:interceptors>-->
 
 
 </beans>

@@ -1,3 +1,4 @@
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
@@ -22,7 +23,7 @@
             <ul>
                 <li>
                     <img alt="当前用户" src="/images/common/user.jpg">：
-                    <span>${USER_IN_SESSION.name}</span>
+                    <span><shiro:principal property="name"/></span>
                 </li>
                 <li>
                     <img alt="今天是" src="/images/common/date.jpg">：

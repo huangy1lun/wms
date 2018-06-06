@@ -1,5 +1,6 @@
 package com.hyl.wms.util;
 
+import org.apache.shiro.SecurityUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -35,7 +36,7 @@ public class SessionUtil {
     }
 
     public static Object getCurrentUserMsg() {
-        return getSession().getAttribute(USER_IN_SESSION);
+        return SecurityUtils.getSubject().getPrincipal();
     }
 
     public static Set<String> getCurrentUserPermission() {

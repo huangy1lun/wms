@@ -7,6 +7,7 @@ import com.hyl.wms.service.IEmployeeService;
 import com.hyl.wms.service.IRoleService;
 import com.hyl.wms.util.RequiredPermission;
 import com.hyl.wms.vo.JSONResult;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -31,7 +32,8 @@ public class EmployeeController {
     private IRoleService roleService;
 
     @RequestMapping("list")
-    @RequiredPermission("员工列表")
+//    @RequiredPermission("员工列表")
+    @RequiresPermissions("cn.wolfcode.wms.web.controller.EmployeeController:list")
     public String list(Map map,@ModelAttribute("qo") EmployeeQueryObject qo) {
         map.put("result", employeeService.query(qo));
         map.put("departments",departmentService.list());

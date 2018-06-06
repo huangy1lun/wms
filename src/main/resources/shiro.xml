@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <!--重定向shiro的登录表单地址-->
+        <property name="loginUrl" value="/login.do"/>
+        <property name="filterChainDefinitions">
+            <value>
+                /js/**=anon
+                /style/**=anon
+                /images/**=anon
+                /upload/**=anon
+                /login.jsp=anon
+                /favicon.ico/**=anon
+                /logout.do=logout
+                /index.jsp=anon
+                /**=authc
+            </value>
+        </property>
+     </bean>
+    <!--自定义realm-->
+    <bean id="realm" class="com.hyl.wms.realm.MyRealm"/>
+    <!--安全管理器-->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realms" ref="realm"/>
+    </bean>
+
+    <!-- 开启aop，对类代理 -->
+    <aop:config proxy-target-class="true"></aop:config>
+    <!-- 开启shiro注解支持 -->
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager" />
+    </bean>
+
+</beans>
